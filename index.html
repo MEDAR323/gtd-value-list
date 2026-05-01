@@ -3,85 +3,101 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MDV - Тест коллажа</title>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <title>MDV - Коллаж юнитов</title>
   <style>
-    body { font-family: Arial; background: #0a0a0a; color: white; padding: 20px; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #0a0a0a; 
+      color: #eee; 
+      margin: 0; 
+      padding: 20px; 
+      text-align: center; 
+    }
     button {
       padding: 15px 30px;
       font-size: 18px;
       background: #4ade80;
       color: black;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       margin: 20px 0;
+      font-weight: bold;
     }
-    .unit-card {
+    .collage {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      max-width: 1200px;
+      margin: 20px auto;
+      background: #111;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .collage-item {
       background: #1a1a1a;
       padding: 10px;
-      margin: 10px 0;
       border-radius: 8px;
       text-align: center;
+    }
+    .collage-item img {
+      width: 100%;
+      height: 110px;
+      object-fit: contain;
     }
   </style>
 </head>
 <body>
 
-  <h1>Тест генерации коллажа</h1>
-  <button onclick="generateCollage()">Создать коллаж из юнитов</button>
+  <h1>MDV Коллаж юнитов</h1>
+  <button onclick="generateCollage()">🖼 Создать коллаж (до 50 юнитов)</button>
 
-  <div id="unitGrid"></div>
+  <div id="collageContainer"></div>
 
   <script>
     let units = [
       { name: "Gold Chicken Coop", img: "images/gold-chicken-coop.png", value: "495K" },
       { name: "Witchleaf", img: "images/witchleaf.png", value: "415K" },
-      { name: "Gold Infectia", img: "images/gold-infectia.png", value: "410K" }
+      { name: "Gold Infectia", img: "images/gold-infectia.png", value: "410K" },
+      { name: "VIP Gamepass", img: "images/vip.png", value: "349 Robux" }
+      // Добавляй сюда своих юнитов
     ];
 
-    function renderUnits() {
-      const grid = document.getElementById('unitGrid');
-      grid.innerHTML = '';
-      units.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'unit-card';
-        div.innerHTML = `<strong>\( {u.name}</strong><br> \){u.value}`;
-        grid.appendChild(div);
-      });
-    }
+    function generateCollage() {
+      const container = document.getElementById('collageContainer');
+      container.innerHTML = '';
 
-    async function generateCollage() {
-      const container = document.createElement('div');
-      container.style.cssText = 'display:grid; grid-template-columns:repeat(5,1fr); gap:10px; width:1200px; background:#111; padding:20px; position:absolute; left:-9999px;';
+      const num = Math.min(50, units.length);
+      let html = `<div class="collage">`;
 
-      units.forEach(unit => {
-        const card = document.createElement('div');
-        card.style.cssText = 'background:#1a1a1a; padding:10px; text-align:center; border-radius:8px;';
-        card.innerHTML = `
-          <img src="\( {unit.img}" style="width:100%; height:100px; object-fit:contain;" onerror="this.src='https://via.placeholder.com/150?text= \){unit.name}'">
-          <div style="margin-top:8px;">${unit.name}</div>
-          <div style="color:#fbbf24;">${unit.value}</div>
-        `;
-        container.appendChild(card);
-      });
-
-      document.body.appendChild(container);
-
-      try {
-        const canvas = await html2canvas(container);
-        const link = document.createElement('a');
-        link.download = 'MDV_Коллаж.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        alert('Коллаж скачан!');
-      } catch(e) {
-        alert('Ошибка создания коллажа');
+      for (let i = 0; i < num; i++) {
+        const u = units[i];
+        html += `
+          <div class="collage-item">
+            <img src="\( {u.img}" onerror="this.src='https://via.placeholder.com/150?text= \){u.name}'">
+            <div style="margin:8px 0 4px;">${u.name}</div>
+            <div style="color:#fbbf24; font-weight:bold;">${u.value}</div>
+          </div>`;
       }
+      html += `</div>`;
 
-      container.remove();
+      container.innerHTML = html;
+
+      // Автоматически предлагаем сохранить как изображение
+      setTimeout(() => {
+        if (confirm("Коллаж создан! Хотите сохранить его как изображение?")) {
+          alert("На телефоне нажмите на три точки в браузере → 'Поделиться' → 'Сохранить как изображение' или сделайте скриншот.");
+        }
+      }, 800);
     }
 
-    window.onload = renderUnits;
+    // Показываем юниты при загрузке
+    window.onload = () => {
+      let html = '<h2>Ваши юниты:</h2>';
+      units.forEach(u => {
+        html += `<div style="margin:10px 0;">${u.name} — ${u.value}</div>`;
+      });
+      document.getElementById('collageContainer').innerHTML = html;
+    };
   </script>
 </body>
 </html>
